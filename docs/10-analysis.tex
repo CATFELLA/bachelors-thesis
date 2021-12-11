@@ -14,7 +14,7 @@
 
 \subsection{QEMU}
 
-кему это круто написать что это такое
+кему это круто написать что это такое \cite{qemu}
 
 \subsubsection{Сворачивание и оптимизация тривиальных выражений}
 
@@ -64,7 +64,7 @@ mov\_i32 t0, \$1\\}
 
 Каждый доступ к памяти проходит через MMU, в нем адреса преобразуются из виртуальных к реальным. Для ускорения трансляции адреса хранится TLB-кэш.
 
-Все блоки трансляции в кэше индексируются при помощи их физического адреса, таким образом нет необходимости очищать кэш при смене страницы.
+Все блоки трансляции в кэше индексируются при помощи их физического адреса, таким образом нет необходимости очищать кэш при смене страницы. \cite{qemu_docs}
 
 \subsection{box64}
 
@@ -97,7 +97,7 @@ box64 это норм написать что такое
 
 После определения функция заносится в таблицу функций библиотеки, а затем находится при помощи разных методов (// посмотреть что за методы).
 
-Одной из оптимизаций в box64, по сравнению с box86, является определение простых функций, такие функции не нуждаются в оберточной функции и вызываются напрямую, тем самым экономя время.
+Одной из оптимизаций в box64, по сравнению с box86, является определение простых функций, такие функции не нуждаются в оберточной функции и вызываются напрямую, тем самым экономя время.  \cite{box64_deep}
 
 \subsubsection{Процесс трансляции}
 
@@ -111,12 +111,15 @@ box64 это норм написать что такое
 	\item[---] На четвертом проходе генерируются необходимые инструкции.
 \end{itemize}
 
-После генерации блока он записывается в таблицу сгенерированных блоков в которой также содержится отображение эмулированных адресов в физические.
+После генерации блока он записывается в таблицу сгенерированных блоков в которой также содержится отображение эмулированных адресов в физические. \cite{box64_wide}
 
 \subsubsection{JITs (mono) and self-modifying code.}
 
 I'm doing something similar, yes. All pages from which x86 code has been translated are write protected. Once a write occurs, all blocks generated from this page are marked dirty, and the jump table from those blocks are invalidated (to avoid automatic jump from block to block to this one). Once x86 code wants to run a "dirty" block, a crc32 of the memory is runned and compared to the crc computed when creating the block. depending if it's the same or non, the block is marked as clean (and the page protected again) or deleted and a new one is generated (and the page also protected again)
 
+\subsection{FEX}
+
+напишем
 
 \subsection{ДАЛЬШЕ МОЖНО НЕ ЧИТАТЬ}
 
