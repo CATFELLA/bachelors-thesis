@@ -114,13 +114,14 @@ box64 это норм написать что такое
 После генерации блока он записывается в таблицу сгенерированных блоков в которой также содержится отображение эмулированных адресов в физические. \cite{box64_wide}
 
 \subsubsection{JITs (mono) and self-modifying code.}
-
+\begin{comment}
 I'm doing something similar, yes. All pages from which x86 code has been translated are write protected. Once a write occurs, all blocks generated from this page are marked dirty, and the jump table from those blocks are invalidated (to avoid automatic jump from block to block to this one). Once x86 code wants to run a "dirty" block, a crc32 of the memory is runned and compared to the crc computed when creating the block. depending if it's the same or non, the block is marked as clean (and the page protected again) or deleted and a new one is generated (and the page also protected again)
-
+\end{comment}
 \subsection{FEX}
 
 напишем
 
+\begin{comment}
 \subsection{ДАЛЬШЕ МОЖНО НЕ ЧИТАТЬ}
 
 Список:
@@ -164,5 +165,6 @@ c^2 = a^2 + b^2
 	{text}
 	{code/main.go}
 \end{code}
+\end{comment}
 
 \pagebreak
