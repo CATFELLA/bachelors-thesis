@@ -1,4 +1,158 @@
 \section*{ПРИЛОЖЕНИЕ A}
 \addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ A}
 
+\begin{Verbatim}[fontsize=\footnotesize]
+Hi. Thanks for your interest in Box! I have answered your question below,
+to make things easier to read.
+As a general design principle for Box, I try to get the Dynarec not too
+complex, but still trying to have decent translated code. Also, I try to be
+able to get back to an x86 instruction from an ARM generated code to be
+able to handle Signal properly.
+
+Sebastien.
+
+Le mer. 8 d=C3=A9c. 2021 =C3=A0 13:34, Mikhail Nitenko <mnitenko@gmail.com>=
+a =C3=A9crit :
+
+> Hello!
+>
+> I=E2=80=99m a final-year student interested in dynamic binary translation=
+,
+> specifically in x86 to ARM. I am writing a bachelor thesis about it
+> and wanted to explore the current optimizations related to
+> translation and wanted to write to you since your project seems to be
+> quite advanced.
+>
+> I read the =C2=ABInner workings=C2=BB and =C2=ABA deep dive into library =
+wrapping=C2=BB
+> articles and wondered about some things, specifically:
+> * How do you determine where the translation block ends? You said
+> =C2=ABthere are a lot of possibilities here=C2=BB, from reading QEMU docs=
+I
+> would imagine that one of them would be a CPU state change that is
+> impossible to determine ahead of time.
+>
+A block is a contiguous array of x86 instructions. A block ends when the
+last instruction has no "next" instruction (like a jump, call or ret) , and
+when that instruction is not referenced by a jump from the current block.
+There are a few exception: multi-bytes NOP are handled, and an unknown
+instruction stop the block unconditionally
+
+* How much memory is allocated for each x86 instruction during pass 0?
+> Is there some kind of table that determines that?
+>
+The memory is dynamically allocated in pass 0. So it will use as much
+memory as needed.
+
+* JITs (mono) and self-modifying code. I know that emulating
+> self-modifying code in x86 is difficult, QEMU for example detects
+> writes to pages and invalidates translated code at that page and all
+> pages that follow, are you doing the same? Is there some document that
+> I can read to learn about problems related to JIT (mono, which I
+> assume is open-source .NET)?
+>
+I'm doing something similar, yes. All pages from which x86 code has been
+translated are write protected. Once a write occurs, all blocks generated
+from this page are marked dirty, and the jump table from those blocks are
+invalidated (to avoid automatic jump from block to block to this one). Once
+x86 code wants to run a "dirty" block, a crc32 of the memory is runned and
+compared to the crc computed when creating the block. depending if it's the
+same or non, the block is marked as clean (and the page protected again) or
+deleted and a new one is generated (and the page also protected again)
+
+* Am I correct in understanding that dynarec is used to translate x86
+> instructions into ARM instructions and x86 emulation is code in C that
+> emulates an instruction?
+>
+Box86 and Box64 include an Interpreter, coded in C, that can interpret x86
+code on any architecture, and a Dynarec, actually only available for ARM.
+The Dynarec is coded in C also, with very little assembly file (just the
+prolog / epilog of a function call basically). The Dynarec will use
+"Emitter", (ab)using C macro, to generate actual arm opcodes.
+
+>
+>
+> Also, maybe you would be able to point me to some other resource
+> where I learn more about translation optimizations? Any help would be
+> greatly appreciated!
+>
+You should have a look at FEX project. This project has a huge emphasis on
+the dynarec and code translation optimisation
+\end{Verbatim}
+
+\pagebreak
+
+\section*{ПРИЛОЖЕНИЕ Б}
+\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ Б}
+
+\begin{Verbatim}[fontsize=\footnotesize]
+Oh, hey there.
+
+For your specific questions. The pass manager is purely a construct
+that manages some pass classes and ensures optimization passes are run
+over the IR in correct order.
+This can be found here:
+https://github.com/FEX-Emu/FEX/blob/main/External/FEXCore/Source/Interface/IR/
+PassManager.cpp
+The same equivalent can be found in other compiler projects like LLVM.
+
+Self-modifying code is currently semi-nonworking under FEX.
+We have three modes of operation:
+No SMC - Assumes zero code invalidation, highly dangerous.
+mmap based invalidation - On mmap and munmap, ensure any overlapping
+executable regions get code invalidated. Fixes issues where libraries
+are loaded and need invalidation
+per-instruction validation - This is the worst case situation, we emit
+an instruction check at every.single. emulated instruction. Very
+/very/ slow, only for debugging purposes.
+
+We have plans to implement write protecting based invalidation but
+haven't had the time to get around to it. It's pretty much the only
+good way of detecting SMC.
+
+The full list of passes can be seen in the PassManager link with
+`AddDefaultPasses`, `AddDefaultValidationPasses`, and
+`InsertRegisterAllocationPass`.
+With implementations living at:
+https://github.com/FEX-Emu/FEX/tree/main/External/FEXCore/Source/Interface/IR/
+Passes
+
+Unlike a compiler, we've got some heavy deadline constraints for how
+long we can take optimizing the code, and luckily the code will have
+run through a compiler that does most of that anyway.
+Some of the more "hidden" optimizations come from around the IR
+optimization. Our IR is designed to look like AArch64 to some extent,
+which means we don't really need something like a high level IR then a
+machine level IR to get close to "optimal".
+Additionally some of the memory allocations and container functions
+around the IR optimize around code size limits, forward only temporary
+allocator for smart CPU cache behaviour, linked lists that the
+elements are packed tightly in most cases so forward data fetching
+that the CPU does will be optimal.
+Probably some other various bits.
+
+I should also say that I'm not fully happy about FEX's codegen yet
+either. There's a /lot/ of room for improvement since we miss a bunch
+of optimization opportunities.
+One of the big things that can help is our AOT compilation. We have
+some minor work towards both x86->IR AOT and I'm in the process of
+writing IR->Code AOT.
+With AOT we can throw heavier optimizations at the IR that we can't do
+in JIT time. Which will improve long term performance of the
+application.
+
+Currently our code generates a /bunch/ of redundant register moves for
+example. ARM CPUs that have really good renaming support will be
+inordinately faster than expected.
+
+Some of the things to learn more about translation optimizations
+mostly looks like reading compiler optimization techniques and picking
+optimizations that don't take quadratic time complexity like that.
+So anything compiler theory can help out JITs. There are of course
+domain specific optimizations, which are what would help JITs the
+most.
+For applications using x87, you can optimize that to not use a
+softfloat emulation for example.
+\end{Verbatim}
+
 \pagebreak
