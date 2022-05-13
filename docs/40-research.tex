@@ -1,3 +1,534 @@
 \section{Исследовательская часть}
 
-\pagebreak
+В рамках дипломной работы было проведено исследование изменения результатов бенчмарка nbench с разработанным проходом. Результаты исследования представлены в этом разделе.
+
+\section{Описание используемых данных}
+
+Для проведения исследования используется бенчмарк nbench скомпилированный при помощи gcc в два разных бинарных файла: с флагом -O0 и с флагом -O3.
+
+Динамический транслятор FEX запускается на SOC Rockchip RK3399, Exynos 8895 и Apple M1. Система работающая на RK3399 работает под управлением Linux; Exynos --- Android, сам запуск производится через chroot в окружение Debian; Apple M1 --- виртуальная машина с Ubuntu.
+
+Из-за того что SOC RK3399 и Exynos 8895 используют архитектуру big.LITTLE у них одинаковые <<малые>> ядра --- Cortex A53. Как уже было упомянуто эти ядра не выполняют внеочередное исполнение инструкций, так что нет особого смысла проводить тесты с ними, поэтому ниже представлены результаты бенчмарков для их <<больших>> ядер --- Cortex A72 для RK3399 и Mongoose M2 для Exynos 8895.
+
+\section{Результаты исследования}
+
+вернуть нули в графики
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.06,
+			ymax=760,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 244.86) (Cortex A72, 42.822) (Mongoose M2, 42.892)};
+			\addplot coordinates {(Apple M1 Firestorm, 749.14) (Cortex A72, 175.83) (Mongoose M2, 273.33)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест NUMERIC SORT, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.145,
+			ymax=1700,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 1445.4) (Cortex A72, 211.07) (Mongoose M2, 233.51)};
+			\addplot coordinates {(Apple M1 Firestorm, 1664.2) (Cortex A72, 491.36) (Mongoose M2, 776.6)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест NUMERIC SORT, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.035,
+			ymax=360,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 88.737) (Cortex A72, 12.993) (Mongoose M2, 12.125)};
+			\addplot coordinates {(Apple M1 Firestorm, 356.68) (Cortex A72, 71.129) (Mongoose M2, 116.83)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест STRING SORT, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.03,
+			ymax=750,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 166.49) (Cortex A72, 25.239) (Mongoose M2, 21.839)};
+			\addplot coordinates {(Apple M1 Firestorm, 739.69) (Cortex A72, 120.41) (Mongoose M2, 220.3)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест STRING SORT, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.028,
+			ymax=336230000,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 70700000) (Cortex A72, 9081300) (Mongoose M2, 10669000)};
+			\addplot coordinates {(Apple M1 Firestorm, 336290000) (Cortex A72, 50998000) (Mongoose M2, 80384000)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест BITFIELD, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.13,
+			ymax=489540000,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 169440000) (Cortex A72, 56259000) (Mongoose M2, 87132000)};
+			\addplot coordinates {(Apple M1 Firestorm, 489440000) (Cortex A72, 210660000) (Mongoose M2, 297220000)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест BITFIELD, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.04,
+			ymax=72,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 17.174) (Mongoose M2, 3.6548) (Cortex A72, 2.7173)};
+			\addplot coordinates {(Apple M1 Firestorm, 70.873) (Mongoose M2, 19.727) (Cortex A72, 12.634)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест FP EMULATION, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.068,
+			ymax=650,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 461.94) (Mongoose M2, 66.567) (Cortex A72, 41.355)};
+			\addplot coordinates {(Apple M1 Firestorm, 643.12) (Mongoose M2, 235.04) (Cortex A72, 140.37)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест FP EMULATION, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.08,
+			ymax=73385,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 31195) (Mongoose M2, 5334.9) (Cortex A72, 7203)};
+			\addplot coordinates {(Apple M1 Firestorm, 72385) (Mongoose M2, 19699) (Cortex A72, 14606)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест FOURIER, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.09,
+			ymax=83508,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 43357) (Mongoose M2, 6834.1) (Cortex A72, 9892.5)};
+			\addplot coordinates {(Apple M1 Firestorm, 83008) (Mongoose M2, 22571) (Cortex A72, 17026)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест FOURIER, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.065,
+			ymax=19,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 6.0509) (Mongoose M2, 1.1416) (Cortex A72, 1.2583)};
+			\addplot coordinates {(Apple M1 Firestorm, 18.089) (Mongoose M2, 7.2608) (Cortex A72, 4.1153)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест ASSIGNMENT, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.11,
+			ymax=65,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 60.332) (Mongoose M2, 6.2922) (Cortex A72, 9.7657)};
+			\addplot coordinates {(Apple M1 Firestorm, 63.124) (Mongoose M2, 17.205) (Cortex A72, 15.908)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест ASSIGNMENT, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.099,
+			ymax=4580,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 2028.3) (Mongoose M2, 463.33) (Cortex A72, 401.68)};
+			\addplot coordinates {(Apple M1 Firestorm, 4480.3) (Mongoose M2, 1076.2) (Cortex A72, 780)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест IDEA, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.30,
+			ymax=7015,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 7036.8) (Mongoose M2, 1680) (Cortex A72, 1660.4)};
+			\addplot coordinates {(Apple M1 Firestorm, 6999.7) (Mongoose M2, 3510.4) (Cortex A72, 1956.9)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест IDEA, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.05,
+			ymax=1800,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 459.81) (Mongoose M2, 90.36) (Cortex A72, 81.802)};
+			\addplot coordinates {(Apple M1 Firestorm, 1791.2) (Mongoose M2, 450) (Cortex A72, 307.7)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест HUFFMAN, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.104,
+			ymax=5900,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 3644.6) (Mongoose M2, 547.46) (Cortex A72, 570.37)};
+			\addplot coordinates {(Apple M1 Firestorm, 5890.6) (Mongoose M2, 2076.6) (Cortex A72, 1240)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест HUFFMAN, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.04,
+			ymax=646,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 168.8) (Mongoose M2, 23.784) (Cortex A72, 33.265)};
+			\addplot coordinates {(Apple M1 Firestorm, 636.6) (Mongoose M2, 229.72) (Cortex A72, 164.16)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест LU DECOMPOSITION, nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 9cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.055,
+			ymax=2947,
+			ylabel={Итераций в секунду},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 1240.5) (Mongoose M2, 151.81) (Cortex A72, 281.26)};
+			\addplot coordinates {(Apple M1 Firestorm, 2847.6) (Mongoose M2, 1024.3) (Cortex A72, 580.25)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{Тест LU DECOMPOSITION, nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\newpage
+
+я только что понял что наверное все это вообще не нужно )))
+
+вот получше вариантик
+
+\newpage
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 8cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.1,
+			ymax=100,
+			ylabel={Счет},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 36.887) (Mongoose M2, 8.979) (Cortex A72, 10.22)};
+			\addplot coordinates {(Apple M1 Firestorm, 98.211) (Mongoose M2, 36.242) (Cortex A72, 26.64)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{nbench O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 8cm,
+			width = 12cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.14,
+			ymax=233,
+			ylabel={Счет},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 135.182) (Mongoose M2, 28.307) (Cortex A72, 32.239)};
+			\addplot coordinates {(Apple M1 Firestorm, 223.307) (Mongoose M2, 93.11) (Cortex A72, 63.655)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{nbench O3}
+	\label{fig:speed}
+\end{figure}
+
+\newpage
+
+Таким образом по результатам замеров видно что проход имеет наибольшее влияние на неоптимизированный бенчмарк (собранный с флагом -O0), также стоит заметить что для Apple M1 рост в производительности не так велик.
+
+Рост в производительности составил:
+\begin{itemize}[leftmargin=1.6\parindent]
+	\item[---] Cortex A72 --- средняя производительность выше в 2.6 раз для O0 и в 1.97 раз для O3;
+	\item[---] Mongoose M2 --- средняя производительность выше в 4 раза для O0 и в 3.28 раз для O3;
+	\item[---] Apple M1 Firestorm --- средняя производительность выше в 2.66 раз для O0 и в 1.65 раз для O3.
+\end{itemize}
+
+Такой высокий рост производительности для старых ядер связан с затратностью барьерных операций с памятью, новые поколения ядер уменьшают затратность таких операций.
+
+\section{Тестирование на надежность}
+
+Главной причиной разработки алгоритма по оптимизации доступа к памяти являлась слабая модель архитектуры ARM, что при трансляции многопоточных приложений приводило к ошибкам.
+
+Для проверки корректной работы прохода использовался tst-cond16.c --- тест библиотеки libc. Этот тест создает 8 потоков которые проводят операции с мьютексами. Без барьерных инструкций тест не проходит, с оптимизирующим проходом этот тест проходит.
+
+\section{Вывод}
+
+В результате исследования было установлено, что время поиска по
+гомоморфно зашифрованным данным зависит от длины шифртекста и от
+количества записей в базе. Зависимость времени поиска от размера базы
+данных на рассмотренном участке линейна. При длине шифртекста 128 слотов
+и размере базы данных 5 записей время поиска составляет около 17 минут,
+для практического применения метод должен быть улучшен с точки зрения
+временных затрат.
+
+Также было частично доказано что барьерные инструкции доступа к памяти сильнее влияют на ранее выпущенные ядра ARM.
