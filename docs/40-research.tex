@@ -464,17 +464,17 @@
 			ybar,
 			enlarge x limits=0.15,
 			enlarge y limits=0.97,
-			ymax=6,
+			ymax=11,
 			ylabel={Счет},
 			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(Apple M1 Firestorm, 5) (Mongoose M2, 5) (Cortex A72, 2.627) (Cortex A53, 2.853)};
-			\addplot coordinates {(Apple M1 Firestorm, 5) (Mongoose M2, 5) (Cortex A72, 5.578) (Cortex A53, 4.011)};
+			\addplot coordinates {(Apple M1 Firestorm, 5) (Mongoose M2, 8.968) (Cortex A72, 10.205) (Cortex A53, 8.795)};
+			\addplot coordinates {(Apple M1 Firestorm, 5) (Mongoose M2, 9.084) (Cortex A72, 10.386) (Cortex A53, 8.832)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
-	\caption{nbench int}
+	\caption{nbench O0}
 	\label{fig:speed}
 \end{figure}
 
@@ -488,17 +488,65 @@
 			ybar,
 			enlarge x limits=0.15,
 			enlarge y limits=1.64,
-			ymax=13,
+			ymax=7700,
 			ylabel={Счет},
 			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 12) (Cortex A72, 7.593) (Cortex A53, 5.914)};
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 12) (Cortex A72, 11.948) (Cortex A53, 6.970)};
+			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 5326.9) (Cortex A72, 7125.4) (Cortex A53, 3950)};
+			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 5559.8) (Cortex A72, 7661.9) (Cortex A53, 3989.2)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
-	\caption{nbench float}
+	\caption{nbench FOURIER O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 8cm,
+			width = 16cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=1.64,
+			ymax=460,
+			ylabel={Счет},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 462.76) (Cortex A72, 402.74) (Cortex A53, 272.31)};
+			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 494.46) (Cortex A72, 451.94) (Cortex A53, 279.77)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{nbench IDEA O0}
+	\label{fig:speed}
+\end{figure}
+
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 8cm,
+			width = 16cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=1.64,
+			ymax=87,
+			ylabel={Счет},
+			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 90.183) (Cortex A72, 83.382) (Cortex A53, 85.976)};
+			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 95.002) (Cortex A72, 86.868) (Cortex A53, 86.536)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{nbench HUFFMAN O0}
 	\label{fig:speed}
 \end{figure}
 
@@ -510,8 +558,8 @@
 
 Рост в производительности составил:
 \begin{itemize}[leftmargin=1.6\parindent]
-	\item[---] Cortex A53 --- производительность целочисленных вычислений выше в 1.4 раз и в 1.17 раз для вычислений с плавающей точкой;
-	\item[---] Cortex A72 --- производительность целочисленных вычислений выше в 2.12 раз и в 1.57 раз для вычислений с плавающей точкой;
+	\item[---] Cortex A53 --- ;
+	\item[---] Cortex A72 --- ;
 	\item[---] ещо другие ядра;
 \end{itemize}
 
