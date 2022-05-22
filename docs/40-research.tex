@@ -2,15 +2,33 @@
 
 В рамках дипломной работы было проведено исследование изменения результатов бенчмарка nbench с разработанным проходом. Результаты исследования представлены в этом разделе.
 
-\section{Описание используемых данных}
+\subsection{Описание используемых данных}
 
 Для проведения исследования используется бенчмарк nbench скомпилированный при помощи gcc в два разных бинарных файла: с флагом -O0 и с флагом -O3.
 
+В бенчмарке nbench реализовано 9 тестов:
+
+\begin{itemize}[leftmargin=1.6\parindent]
+	\item[---] Numeric sort --- сортировка массива 32-х битных чисел. Оценивается производительность работы с целыми числами.
+	\item[---] String sort --- сортировка массива символов. Проверяется скорость работы с памятью.
+	\item[---] Bitfield --- выполняет различные битовые операции. Например: очистить или выставить n бит, инвертировать число. Оценивается скорость выполнения таких операций.
+	\item[---] Emulated floating-point --- небольшой эмулятор для работы с числами с плавающей запятой. Хорошо оценивает общую производительность.
+	\item[---] Fourier coefficients --- рассчитывает коэффициенты Фурье. Оценивает производительность FPU, при этом память использует не активно.
+	\item[---] Assignment algorithm --- решение задачи о назначениях. Работает с массивом, на результат влияет скорость последовательного доступа к памяти.
+	\item[---] Huffman compression --- алгоритм Хаффмана. Операции с байтами, битами и с целыми числами. Считается хорошей оценкой общей производительности.
+	\item[---] IDEA encryption --- алгоритм шифрования. Оценивает скорость исполнения кода.
+	\item[---] LU Decomposition ---  алгоритм решения линейных уравнений. Работает с числами с плавающей запятой, использует только фундаментальные операции (+, -, *, /).
+\end{itemize}
+
+В итоге получаются INTEGER INDEX и FLOATING-POINT INDEX --- комбинированный результат бенчмарков.
+
 Динамический транслятор FEX запускается на SOC Rockchip RK3399, Exynos 8895 и Apple M1. Система работающая на RK3399 работает под управлением Linux; Exynos --- Android, сам запуск производится через chroot в окружение Debian; Apple M1 --- виртуальная машина с Ubuntu.
 
-Из-за того что SOC RK3399 и Exynos 8895 используют архитектуру big.LITTLE у них одинаковые <<малые>> ядра --- Cortex A53. Больших различий между этими ядрами нет, поэтому в тестах использовались результаты работы этого ядра на RK3399. Раздельно представлены результаты бенчмарков для их <<больших>> ядер --- Cortex A72 для RK3399 и Mongoose M2 для Exynos 8895.
+Из-за того что SOC RK3399 и Exynos 8895 используют архитектуру \\ big.LITTLE у них одинаковые <<малые>> ядра --- Cortex A53. Больших различий между этими ядрами нет, поэтому в тестах использовались результаты работы этого ядра на RK3399. Раздельно представлены результаты бенчмарков для их <<больших>> ядер --- Cortex A72 для RK3399 и Mongoose M2 для Exynos 8895.
 
-\section{Результаты исследования}
+Замеры времени выполнения проводились на версии FEX-2204.
+
+\subsection{Результаты исследования}
 
 вернуть нули в графики
 
@@ -26,11 +44,11 @@
 			enlarge y limits=0.97,
 			ymax=11,
 			ylabel={Счет},
-			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(Apple M1 Firestorm, 5) (Mongoose M2, 8.968) (Cortex A72, 10.205) (Cortex A53, 8.795)};
-			\addplot coordinates {(Apple M1 Firestorm, 5) (Mongoose M2, 9.084) (Cortex A72, 10.386) (Cortex A53, 8.832)};
+			\addplot coordinates {(M1 Firestorm, 5) (Mongoose M2, 8.968) (Cortex A72, 10.205) (Cortex A53, 8.795)};
+			\addplot coordinates {(M1 Firestorm, 5) (Mongoose M2, 9.084) (Cortex A72, 10.386) (Cortex A53, 8.832)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -50,11 +68,11 @@
 			enlarge y limits=1.64,
 			ymax=7700,
 			ylabel={Счет},
-			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 5326.9) (Cortex A72, 7125.4) (Cortex A53, 3950)};
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 5559.8) (Cortex A72, 7661.9) (Cortex A53, 3989.2)};
+			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 5326.9) (Cortex A72, 7125.4) (Cortex A53, 3950)};
+			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 5559.8) (Cortex A72, 7661.9) (Cortex A53, 3989.2)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -74,11 +92,11 @@
 			enlarge y limits=1.64,
 			ymax=460,
 			ylabel={Счет},
-			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 462.76) (Cortex A72, 402.74) (Cortex A53, 272.31)};
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 494.46) (Cortex A72, 451.94) (Cortex A53, 279.77)};
+			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 462.76) (Cortex A72, 402.74) (Cortex A53, 272.31)};
+			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 494.46) (Cortex A72, 451.94) (Cortex A53, 279.77)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -98,11 +116,11 @@
 			enlarge y limits=1.64,
 			ymax=87,
 			ylabel={Счет},
-			symbolic x coords={Apple M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 90.183) (Cortex A72, 83.382) (Cortex A53, 85.976)};
-			\addplot coordinates {(Apple M1 Firestorm, 12) (Mongoose M2, 95.002) (Cortex A72, 86.868) (Cortex A53, 86.536)};
+			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 90.183) (Cortex A72, 83.382) (Cortex A53, 85.976)};
+			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 95.002) (Cortex A72, 86.868) (Cortex A53, 86.536)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -114,7 +132,7 @@ add O3
 
 \newpage
 
-Таким образом по результатам замеров видно что проход работает только на неоптимизированном бенчмарке (собранном с флагом -O0), также стоит заметить что для Apple M1 рост в производительности не так велик.
+Таким образом по результатам замеров видно что проход работает только на не оптимизированном бенчмарке (собранном с флагом -O0), также стоит заметить что для Apple M1 рост в производительности не так велик.
 
 На O3 рост производительности незначителен, это связано с тем что регистр RBP, при оптимизации, используется в качестве регистра общего назначения.
 
@@ -127,13 +145,13 @@ add O3
 
 Более высокий рост производительности для старых ядер связан с затратностью барьерных операций с памятью, новые поколения ядер уменьшают затратность таких операций.
 
-\section{Тестирование на надежность}
+\subsection{Тестирование на надежность}
 
 Главной причиной разработки алгоритма по оптимизации доступа к памяти являлась слабая модель архитектуры ARM, что при трансляции многопоточных приложений приводило к ошибкам.
 
 Для проверки корректной работы прохода использовался tst-cond16.c --- тест библиотеки libc. Этот тест создает 8 потоков которые проводят операции с мьютексами. Стандартная версия транслятора и версия с оптимизирующим проходом этот тест проходит, без барьерных инструкций и с безусловной заменой барьерных операций связанных с регистром RBP тест не проходит.
 
-\section{Вывод}
+\subsection{Вывод}
 
 В результате исследования было установлено, что норм проход)
 
