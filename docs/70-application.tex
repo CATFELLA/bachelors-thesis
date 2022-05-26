@@ -1,6 +1,263 @@
 \section*{ПРИЛОЖЕНИЕ A}
 \addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ A}
 
+\begin{code}
+	\captionof{listing}{Проход оптимизации доступа к памяти}
+	\label{code:args}
+	\begin{minted}
+		[
+		frame=single,
+		framerule=0.5pt,
+		framesep=20pt,
+		fontsize=\scriptsize,
+		tabsize=4,
+		linenos,
+		numbersep=5pt,
+		xleftmargin=10pt,
+		]
+		{text}
+#include <FEXCore/Core/X86Enums.h>
+#include <FEXCore/IR/IR.h>
+#include <FEXCore/IR/IREmitter.h>
+#include <FEXCore/IR/IntrusiveIRList.h>
+
+#include <array>
+#include <iostream>
+
+#include "Interface/Core/OpcodeDispatcher.h"
+#include "Interface/IR/PassManager.h"
+
+namespace FEXCore::IR {
+	
+	enum RBP_STATE {
+		NOT_CHANGED = (0b000 << 0),
+		STACK = (0b001 << 0),
+		NOT_STACK = (0b010 << 0),
+	};
+	
+	struct BlockInfo {
+		int State = NOT_CHANGED;
+		std::set<OrderedNode*> StackNodes;
+		std::set<OrderedNode*> UnStackNodes;
+		std::vector<OrderedNode*> Predecessors;
+		bool Visited = false;
+	};
+	
+	class StackAccessTSORemovalPass final : public Pass {
+		public:
+		bool Run(IREmitter* IREmit) override;
+		
+		private:
+		void CalculateControlFlowInfo(IREmitter* IREmit);
+		int CalculateComplexState(const OrderedNode* TargetNode,
+		const IRListView& CurrentIR);
+		std::unordered_map<NodeID, BlockInfo> OffsetToBlockMap;
+	};
+	
+	static bool HitsRegister(const int Register, IREmitter* IREmit,
+	IROp_Header* Op) {
+		std::queue<IROp_Header*> values{};
+		values.push(Op);
+		
+		while (!values.empty()) {
+			IROp_Header* ValOp = values.front();
+			values.pop();
+			
+			switch (ValOp->Op) {
+				case IR::OP_ADD:
+				case IR::OP_SUB:
+				case IR::OP_OR:
+				case IR::OP_AND: {
+					values.push(IREmit->GetOpHeader(ValOp->Args[0]));
+					values.push(IREmit->GetOpHeader(ValOp->Args[1]));
+					
+					break;
+				}
+				case IR::OP_LOADREGISTER: {
+					auto LocalOp = ValOp->CW<IR::IROp_LoadRegister>();
+					
+					if (LocalOp->Offset ==
+					offsetof(FEXCore::Core::CPUState, gregs[Register]) &&
+					LocalOp->Class == GPRClass) {
+						return true;
+					}
+					
+					break;
+				}
+				default: {
+					break;
+				}
+			}
+		}
+		
+		/* never hit the RSP register, so it's not a stack value being
+		* loaded. */
+		return false;
+	}
+	
+	void StackAccessTSORemovalPass::CalculateControlFlowInfo(IREmitter* IREmit) {
+		IRListView CurrentIR = IREmit->ViewIR();
+		
+		for (auto [BlockNode, BlockHeader] : CurrentIR.GetBlocks()) {
+			BlockInfo* CurrentBlock =
+			&OffsetToBlockMap.try_emplace(CurrentIR.GetID(BlockNode)).first->second;
+			for (auto [CodeNode, IROp] : CurrentIR.GetCode(BlockNode)) {
+				switch (IROp->Op) {
+					case IR::OP_CONDJUMP: {
+						auto Op = IROp->CW<IR::IROp_CondJump>();
+						
+						{
+							auto Block =
+							&OffsetToBlockMap.try_emplace(Op->TrueBlock.ID()).first->second;
+							Block->Predecessors.emplace_back(BlockNode);
+						}
+						
+						{
+							auto Block = &OffsetToBlockMap.try_emplace(Op->FalseBlock.ID())
+							.first->second;
+							Block->Predecessors.emplace_back(BlockNode);
+						}
+						
+						break;
+					}
+					case IR::OP_JUMP: {
+						auto Op = IROp->CW<IR::IROp_Jump>();
+						
+						{
+							auto Block =
+							OffsetToBlockMap.try_emplace(Op->Header.Args[0].ID()).first;
+							Block->second.Predecessors.emplace_back(BlockNode);
+						}
+						
+						break;
+					}
+					case IR::OP_STOREREGISTER: {
+						IROp_StoreRegister* Op = IROp->CW<IR::IROp_StoreRegister>();
+						if (Op->Offset == offsetof(FEXCore::Core::CPUState,
+						gregs[FEXCore::X86State::REG_RBP]) &&
+						Op->Class == GPRClass) {
+							if (HitsRegister(FEXCore::X86State::REG_RSP, IREmit,
+							IREmit->GetOpHeader(Op->Value))) {
+								CurrentBlock->State = STACK;
+								CurrentBlock->StackNodes.emplace(CodeNode);
+							} else {
+								CurrentBlock->State = NOT_STACK;
+								CurrentBlock->UnStackNodes.emplace(CodeNode);
+							}
+						}
+						break;
+					}
+					default:
+					break;
+				}
+			}
+		}
+	}
+	
+	// returns the combined state of all the predecessors and the block itself
+	int StackAccessTSORemovalPass::CalculateComplexState(
+	const OrderedNode* TargetNode, const IRListView& CurrentIR) {
+		auto TargetPair = OffsetToBlockMap.find(CurrentIR.GetID(TargetNode));
+		if (TargetPair == OffsetToBlockMap.end()) {
+			std::cout << "TargetPair not found in offsets!" << std::endl;
+			return NOT_STACK;
+		}
+		
+		BlockInfo* TargetBlock = &TargetPair->second;
+		
+		if (TargetBlock->Visited || TargetBlock->Predecessors.size() == 0 ||
+		TargetBlock->State != NOT_CHANGED) {
+			return TargetBlock->State;
+		}
+		
+		TargetBlock->Visited = true;
+		int ResultingState = STACK;
+		for (auto i : TargetBlock->Predecessors) {
+			// only call if predecessor is not visited?
+			if (i == TargetNode) {
+				continue;
+			}
+			int PredecessorState = CalculateComplexState(i, CurrentIR);
+			
+			if (PredecessorState == NOT_CHANGED) {
+				ResultingState = NOT_CHANGED;
+			} else if (PredecessorState == NOT_STACK) {
+				ResultingState = NOT_STACK;
+				break;
+			}
+		}
+		
+		TargetBlock->State = ResultingState;
+		
+		return TargetBlock->State;
+	}
+	
+	bool StackAccessTSORemovalPass::Run(IREmitter* IREmit) {
+		CalculateControlFlowInfo(IREmit);
+		
+		IRListView CurrentIR = IREmit->ViewIR();
+		bool Changed = false;
+		
+		for (auto [BlockNode, BlockHeader] : CurrentIR.GetBlocks()) {
+			auto CurrentBlockPair = OffsetToBlockMap.find(CurrentIR.GetID(BlockNode));
+			if (CurrentBlockPair == OffsetToBlockMap.end()) {
+				std::cout << "Block not found in offsets" << std::endl;
+				continue;
+			}
+			
+			int StackStatus = STACK;
+			BlockInfo* CurrentBlock = &CurrentBlockPair->second;
+			for (auto CodeNode : CurrentBlock->Predecessors) {
+				int PredecessorState = CalculateComplexState(CodeNode, CurrentIR);
+				
+				if (PredecessorState != STACK) {
+					StackStatus = PredecessorState;
+					break;
+				}
+			}
+			
+			for (auto [CodeNode, IROp] : CurrentIR.GetCode(BlockNode)) {
+				if (CurrentBlock->StackNodes.contains(CodeNode)) {
+					StackStatus = STACK;
+				}
+				if (CurrentBlock->UnStackNodes.contains(CodeNode)) {
+					StackStatus = NOT_STACK;
+				}
+				if (IROp->Op == IR::OP_LOADMEMTSO && StackStatus == STACK) {
+					if (HitsRegister(FEXCore::X86State::REG_RBP, IREmit,
+					IREmit->GetOpHeader(IROp->Args[0])) ||
+					HitsRegister(FEXCore::X86State::REG_RSP, IREmit,
+					IREmit->GetOpHeader(IROp->Args[0]))) {
+						IROp->Op = IR::OP_LOADMEM;
+						Changed = true;
+					}
+				}
+				if (IROp->Op == IR::OP_STOREMEMTSO && StackStatus == STACK) {
+					if (HitsRegister(FEXCore::X86State::REG_RBP, IREmit,
+					IREmit->GetOpHeader(IROp->Args[1])) ||
+					HitsRegister(FEXCore::X86State::REG_RSP, IREmit,
+					IREmit->GetOpHeader(IROp->Args[1]))) {
+						IROp->Op = IR::OP_STOREMEM;
+						Changed = true;
+					}
+				}
+			}
+			
+			CurrentBlock->Visited = true;
+			CurrentBlock->State = StackStatus;
+		}
+		
+		return Changed;
+	}
+	
+	std::unique_ptr<Pass> CreateStackAccessTSORemovalPass() {
+		return std::make_unique<StackAccessTSORemovalPass>();
+	}
+}  // namespace FEXCore::IR
+	\end{minted}
+\end{code}
+
+\begin{comment}
 \begin{Verbatim}[fontsize=\footnotesize]
 Hi. Thanks for your interest in Box! I have answered your question below,
 to make things easier to read.
@@ -154,5 +411,6 @@ most.
 For applications using x87, you can optimize that to not use a
 softfloat emulation for example.
 \end{Verbatim}
+\end{comment}
 
 \pagebreak

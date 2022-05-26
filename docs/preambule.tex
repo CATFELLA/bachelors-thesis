@@ -6,6 +6,10 @@
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
 
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\floatname{algorithm}{Алгоритм}
+
 % Для работы с несколькими языками и шрифтом Times New Roman по-умолчанию
 \usepackage[english,russian]{babel}
 \usepackage{fontspec}
@@ -100,6 +104,26 @@
 	showstringspaces=false,
 	inputencoding=utf8x,
 	keepspaces=true
+}
+
+\lstset{
+	basicstyle=\fontsize{11}{10}\selectfont\ttfamily,
+	language=C++,
+	texcl=true,
+	numbers=left,
+	numbersep=5pt,
+	tabsize=4,
+	extendedchars=\true,
+	breaklines=true,
+	keywordstyle=\bfseries\color{blue},
+	frame=single,
+	xleftmargin=17pt,
+	%framexleftmargin=17pt,
+	framexrightmargin=5pt,
+	framexbottommargin=4pt,
+	showstringspaces=false,
+	inputencoding=utf8x,
+	keepspaces=true,
 }
 
 \DeclareCaptionLabelSeparator{line}{\ --\ }

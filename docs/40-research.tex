@@ -22,6 +22,8 @@
 
 В итоге получаются INTEGER INDEX и FLOATING-POINT INDEX --- комбинированный результат бенчмарков.
 
+Каждый бенчмарк запускается 5 раз, затем рассчитывается среднеквадратическое отклонение и доверительный интервал с уровнем доверия 0.95. Если длина полуинтервала меньше 1\% от абсолютного значения среднего, то замер времени считается успешным, иначе проводятся дополнительные замеры.
+
 Динамический транслятор FEX запускается на SOC Rockchip RK3399, Exynos 8895 и Apple M1. Система работающая на RK3399 работает под управлением Linux; Exynos --- Android, сам запуск производится через chroot в окружение Debian; Apple M1 --- виртуальная машина с Ubuntu.
 
 Из-за того что SOC RK3399 и Exynos 8895 используют архитектуру \\ big.LITTLE у них одинаковые <<малые>> ядра --- Cortex A53. Больших различий между этими ядрами нет, поэтому в тестах использовались результаты работы этого ядра на RK3399. Раздельно представлены результаты бенчмарков для их <<больших>> ядер --- Cortex A72 для RK3399 и Mongoose M2 для Exynos 8895.
@@ -30,7 +32,7 @@
 
 \subsection{Результаты исследования}
 
-вернуть нули в графики
+На рисунках \ref{fig:o0}-\ref{fig:o3} представлены результаты замеров скорости выполнения nbench с использованием алгоритма и без.
 
 \begin{figure}[hbtp]
 	\centering
@@ -41,19 +43,19 @@
 			width = 16cm,
 			ybar,
 			enlarge x limits=0.15,
-			enlarge y limits=0.97,
-			ymax=11,
+			enlarge y limits=0.305,
+			ymax=38,
 			ylabel={Счет},
 			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(M1 Firestorm, 5) (Mongoose M2, 8.968) (Cortex A72, 10.205) (Cortex A53, 8.795)};
-			\addplot coordinates {(M1 Firestorm, 5) (Mongoose M2, 9.084) (Cortex A72, 10.386) (Cortex A53, 8.832)};
+			\addplot coordinates {(M1 Firestorm, 36.882) (Mongoose M2, 8.968) (Cortex A72, 10.205) (Cortex A53, 8.795)};
+			\addplot coordinates {(M1 Firestorm, 37.532) (Mongoose M2, 9.084) (Cortex A72, 10.386) (Cortex A53, 8.832)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
 	\caption{nbench O0}
-	\label{fig:speed}
+	\label{fig:o0}
 \end{figure}
 
 \begin{figure}[hbtp]
@@ -65,14 +67,14 @@
 			width = 16cm,
 			ybar,
 			enlarge x limits=0.15,
-			enlarge y limits=1.64,
-			ymax=7700,
+			enlarge y limits=0.1375,
+			ymax=32701,
 			ylabel={Счет},
 			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 5326.9) (Cortex A72, 7125.4) (Cortex A53, 3950)};
-			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 5559.8) (Cortex A72, 7661.9) (Cortex A53, 3989.2)};
+			\addplot coordinates {(M1 Firestorm, 31202) (Mongoose M2, 5326.9) (Cortex A72, 7125.4) (Cortex A53, 3950)};
+			\addplot coordinates {(M1 Firestorm, 32601) (Mongoose M2, 5559.8) (Cortex A72, 7661.9) (Cortex A53, 3989.2)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -89,14 +91,14 @@
 			width = 16cm,
 			ybar,
 			enlarge x limits=0.15,
-			enlarge y limits=1.64,
-			ymax=460,
+			enlarge y limits=0.155,
+			ymax=2060.9,
 			ylabel={Счет},
 			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 462.76) (Cortex A72, 402.74) (Cortex A53, 272.31)};
-			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 494.46) (Cortex A72, 451.94) (Cortex A53, 279.77)};
+			\addplot coordinates {(M1 Firestorm, 2035.4) (Mongoose M2, 462.76) (Cortex A72, 402.74) (Cortex A53, 272.31)};
+			\addplot coordinates {(M1 Firestorm, 2052.9) (Mongoose M2, 494.46) (Cortex A72, 451.94) (Cortex A53, 279.77)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -113,14 +115,14 @@
 			width = 16cm,
 			ybar,
 			enlarge x limits=0.15,
-			enlarge y limits=1.64,
-			ymax=87,
+			enlarge y limits=0.202,
+			ymax=497.55,
 			ylabel={Счет},
 			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
 			xtick=data,  
 			]  
-			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 90.183) (Cortex A72, 83.382) (Cortex A53, 85.976)};
-			\addplot coordinates {(M1 Firestorm, 12) (Mongoose M2, 95.002) (Cortex A72, 86.868) (Cortex A53, 86.536)};
+			\addplot coordinates {(M1 Firestorm, 461.28) (Mongoose M2, 90.183) (Cortex A72, 83.382) (Cortex A53, 85.976)};
+			\addplot coordinates {(M1 Firestorm, 487.55) (Mongoose M2, 95.002) (Cortex A72, 86.868) (Cortex A53, 86.536)};
 			\legend{stock, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
@@ -128,22 +130,45 @@
 	\label{fig:speed}
 \end{figure}
 
-add O3
+\begin{figure}[hbtp]
+	\centering
+	\begin{tikzpicture}  
+		\begin{axis}  
+			[ 
+			height = 8cm,
+			width = 16cm,
+			ybar,
+			enlarge x limits=0.15,
+			enlarge y limits=0.207,
+			ymax=138,
+			ylabel={Счет},
+			symbolic x coords={M1 Firestorm, Mongoose M2, Cortex A72, Cortex A53},  
+			xtick=data,  
+			]  
+			\addplot coordinates {(M1 Firestorm, 136.162) (Mongoose M2, 28.307) (Cortex A72, 32.258) (Cortex A53, 23.67)};
+			\addplot coordinates {(M1 Firestorm, 136.218) (Mongoose M2, 28.36) (Cortex A72, 32.318) (Cortex A53, 23.685)};
+			\legend{stock, patch}  
+		\end{axis}  
+	\end{tikzpicture}\\
+	\caption{nbench O3}
+	\label{fig:o3}
+\end{figure}
 
 \newpage
 
-Таким образом по результатам замеров видно что проход работает только на не оптимизированном бенчмарке (собранном с флагом -O0), также стоит заметить что для Apple M1 рост в производительности не так велик.
+Таким образом по результатам замеров видно что проход работает только на не оптимизированном бенчмарке (собранном с флагом -O0), также стоит заметить что для Apple M1 рост в производительности на выделенных бенчмарках меньше.
 
 На O3 рост производительности незначителен, это связано с тем что регистр RBP, при оптимизации, используется в качестве регистра общего назначения.
 
 Рост в производительности составил:
 \begin{itemize}[leftmargin=1.6\parindent]
-	\item[---] Cortex A53 --- производительность в среднем выше в ;
-	\item[---] Cortex A72 --- производительность целочисленных вычислений выше в 2.12 раз и в 1.57 раз для вычислений с плавающей точкой;
-	\item[---] ещо другие ядра;
+	\item[---] Cortex A53 --- производительность в среднем выше в 0.42 процента, для FOURIER --- прирост 1 процент, IDEA --- 2.7 процента, HUFFMAN --- меньше процента;
+	\item[---] Cortex A72 --- производительность в среднем выше в 1.77 процента, для FOURIER --- прирост 7.5 процента, IDEA --- 12.2 процента, HUFFMAN --- 4.2 процента;
+	\item[---] Mongoose M2 --- производительность в среднем выше в 1.29 процента, для FOURIER --- прирост 4.4 процента, IDEA --- 6.8 процента, HUFFMAN --- 5.3 процента;
+	\item[---] M1 Firestorm --- производительность в среднем выше в 1.76 процента, для FOURIER --- прирост 4.5 процента, IDEA --- меньше процента, HUFFMAN --- 5.7 процента;
 \end{itemize}
 
-Более высокий рост производительности для старых ядер связан с затратностью барьерных операций с памятью, новые поколения ядер уменьшают затратность таких операций.
+Более высокий рост производительности для старых ядер связан с затратностью барьерных операций с памятью, новые поколения ядер уменьшают затратность таких операций. У Cortex A53, как было выяснено в аналитическом разделе, разница в скорости выполнения программ с барьерным доступом к памяти и без него мала, поэтому для этого ядра результаты меньше.
 
 \subsection{Тестирование на надежность}
 
@@ -153,6 +178,6 @@ add O3
 
 \subsection{Вывод}
 
-В результате исследования было установлено, что норм проход)
+В результате исследования было установлено, что проход увеличивает производительность отдельных бенчмарков и в целом повышает скорость выполнения транслированного кода, но только если исходный код был собран без оптимизаций.
 
 Также было частично доказано что барьерные инструкции доступа к памяти сильнее влияют на ранее выпущенные ядра ARM.
