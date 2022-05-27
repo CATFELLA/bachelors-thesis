@@ -108,37 +108,28 @@ $BlockInfo$ --- структура хранящая информацию об о
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Алгоритм распространения состояния регистра}
+\subsection{Алгоритм расчета распространенного состояния стека}
 
 Этот алгоритм используется для определения состояния регистра в последующих блоках. Если в блоке 1 была произведена загрузка стекового значения в регистр RBP, а в блоке 2, для которого предок только блок 1, этот регистр не меняется, то для всех потомков блока 2 следует считать что регистр содержит стековое значение.
 
 \begin{algorithm}[H]
 \small
-	\caption{Алгоритм распространения состояния стека}
+	\caption{Алгоритм расчета распространенного состояния стека}
 	\label{alg:bilin}
 	\begin{algorithmic}[1]
-		\State $in$ $\gets$ множество блоков транслированного кода
-		\State $out$ $\gets$ множество блоков транслированного кода с оптимизированным доступом к памяти
-		\State $ControlFlow$ $\gets$ рассчитать порядок выполнения блоков
-		\For{$i$ in $in$}
-		\State $StackStatus$ $\gets$ STACK
-		\For{$j$ in предшевственники $i$}
-		\State $PredecessorState$ $\gets$ рассчитать состояние блока с учетом предшественников
-		\If {$CodeNode$ $\neq$ STACK}
-		\State $StackStatus$ $\gets$ $PredecessorState$
+		\State $TargetBlock$ $\gets$ блок для которого рассчитывается состояние стека
+		\State $ControlFlow$ $\gets$ граф потока выполнения блоков
+		\State $ResultingState$ $\gets$ состояния стека для блока с учетом предыдущих
+		\State $out$ STACK
+		\For{$i$ in предшевственники $TargetBlock$}
+		\State $PredecessorState$ $\gets$ рассчитать распространенное состояние стека для $i$
+		\If {$PredecessorState$ = NOT\_CHANGED}
+		\State $ResultingState$ $\gets$ NOT\_CHANGED
 		\EndIf
-		\EndFor
-		\For{$CodeNode$ in строки кода $i$}
-		\If {$CodeNode$ = инструкция загрузки адреса стека в RBP}
-		\State $StackStatus$ $\gets$ STACK
+		\If {$PredecessorState$ = NOT\_STACK}
+		\State $ResultingState$ $\gets$ NOT\_STACK
+		\State \textbf{break}
 		\EndIf
-		\If {$CodeNode$ = инструкция загрузки любого значения, кроме стека в RBP}
-		\State $StackStatus$ $\gets$ NOT\_STACK
-		\EndIf
-		\If {$StackStatus$ == STACK \textbf{and} $CodeNode$ = инструкция записи или чтения по адресу регистра RBP}
-		\State $out$ $\gets$ заменить барьерную инструкцию на обычную
-		\EndIf
-		\EndFor
 		\EndFor
 	\end{algorithmic}
 \end{algorithm}
