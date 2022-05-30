@@ -1,0 +1,83 @@
+\section*{ПРИЛОЖЕНИЕ Б}
+\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ Б}
+
+\begin{Verbatim}[fontsize=\footnotesize]
+Hi. Thanks for your interest in Box! I have answered your question below,
+to make things easier to read.
+As a general design principle for Box, I try to get the Dynarec not too
+complex, but still trying to have decent translated code. Also, I try to be
+able to get back to an x86 instruction from an ARM generated code to be
+able to handle Signal properly.
+
+Sebastien.
+
+Le mer. 8 d=C3=A9c. 2021 =C3=A0 13:34, Mikhail Nitenko <mnitenko@gmail.com>=
+a =C3=A9crit :
+
+> Hello!
+>
+> I=E2=80=99m a final-year student interested in dynamic binary translation=
+,
+> specifically in x86 to ARM. I am writing a bachelor thesis about it
+> and wanted to explore the current optimizations related to
+> translation and wanted to write to you since your project seems to be
+> quite advanced.
+>
+> I read the =C2=ABInner workings=C2=BB and =C2=ABA deep dive into library =
+wrapping=C2=BB
+> articles and wondered about some things, specifically:
+> * How do you determine where the translation block ends? You said
+> =C2=ABthere are a lot of possibilities here=C2=BB, from reading QEMU docs=
+I
+> would imagine that one of them would be a CPU state change that is
+> impossible to determine ahead of time.
+>
+A block is a contiguous array of x86 instructions. A block ends when the
+last instruction has no "next" instruction (like a jump, call or ret) , and
+when that instruction is not referenced by a jump from the current block.
+There are a few exception: multi-bytes NOP are handled, and an unknown
+instruction stop the block unconditionally
+
+* How much memory is allocated for each x86 instruction during pass 0?
+> Is there some kind of table that determines that?
+>
+The memory is dynamically allocated in pass 0. So it will use as much
+memory as needed.
+
+* JITs (mono) and self-modifying code. I know that emulating
+> self-modifying code in x86 is difficult, QEMU for example detects
+> writes to pages and invalidates translated code at that page and all
+> pages that follow, are you doing the same? Is there some document that
+> I can read to learn about problems related to JIT (mono, which I
+> assume is open-source .NET)?
+>
+I'm doing something similar, yes. All pages from which x86 code has been
+translated are write protected. Once a write occurs, all blocks generated
+from this page are marked dirty, and the jump table from those blocks are
+invalidated (to avoid automatic jump from block to block to this one). Once
+x86 code wants to run a "dirty" block, a crc32 of the memory is runned and
+compared to the crc computed when creating the block. depending if it's the
+same or non, the block is marked as clean (and the page protected again) or
+deleted and a new one is generated (and the page also protected again)
+
+* Am I correct in understanding that dynarec is used to translate x86
+> instructions into ARM instructions and x86 emulation is code in C that
+> emulates an instruction?
+>
+Box86 and Box64 include an Interpreter, coded in C, that can interpret x86
+code on any architecture, and a Dynarec, actually only available for ARM.
+The Dynarec is coded in C also, with very little assembly file (just the
+prolog / epilog of a function call basically). The Dynarec will use
+"Emitter", (ab)using C macro, to generate actual arm opcodes.
+
+>
+>
+> Also, maybe you would be able to point me to some other resource
+> where I learn more about translation optimizations? Any help would be
+> greatly appreciated!
+>
+You should have a look at FEX project. This project has a huge emphasis on
+the dynarec and code translation optimisation
+\end{Verbatim}
+
+\pagebreak

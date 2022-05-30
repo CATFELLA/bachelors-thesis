@@ -1,0 +1,74 @@
+\section*{ПРИЛОЖЕНИЕ В}
+\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ В}
+
+\begin{Verbatim}[fontsize=\footnotesize]
+	Oh, hey there.
+	
+	For your specific questions. The pass manager is purely a construct
+	that manages some pass classes and ensures optimization passes are run
+	over the IR in correct order.
+	This can be found here:
+	https://github.com/FEX-Emu/FEX/blob/main/External/FEXCore/Source/Interface/IR/
+	PassManager.cpp
+	The same equivalent can be found in other compiler projects like LLVM.
+	
+	Self-modifying code is currently semi-nonworking under FEX.
+	We have three modes of operation:
+	No SMC - Assumes zero code invalidation, highly dangerous.
+	mmap based invalidation - On mmap and munmap, ensure any overlapping
+	executable regions get code invalidated. Fixes issues where libraries
+	are loaded and need invalidation
+	per-instruction validation - This is the worst case situation, we emit
+	an instruction check at every.single. emulated instruction. Very
+	/very/ slow, only for debugging purposes.
+	
+	We have plans to implement write protecting based invalidation but
+	haven't had the time to get around to it. It's pretty much the only
+	good way of detecting SMC.
+	
+	The full list of passes can be seen in the PassManager link with
+	`AddDefaultPasses`, `AddDefaultValidationPasses`, and
+	`InsertRegisterAllocationPass`.
+	With implementations living at:
+	https://github.com/FEX-Emu/FEX/tree/main/External/FEXCore/Source/Interface/IR/
+	Passes
+	
+	Unlike a compiler, we've got some heavy deadline constraints for how
+	long we can take optimizing the code, and luckily the code will have
+	run through a compiler that does most of that anyway.
+	Some of the more "hidden" optimizations come from around the IR
+	optimization. Our IR is designed to look like AArch64 to some extent,
+	which means we don't really need something like a high level IR then a
+	machine level IR to get close to "optimal".
+	Additionally some of the memory allocations and container functions
+	around the IR optimize around code size limits, forward only temporary
+	allocator for smart CPU cache behaviour, linked lists that the
+	elements are packed tightly in most cases so forward data fetching
+	that the CPU does will be optimal.
+	Probably some other various bits.
+	
+	I should also say that I'm not fully happy about FEX's codegen yet
+	either. There's a /lot/ of room for improvement since we miss a bunch
+	of optimization opportunities.
+	One of the big things that can help is our AOT compilation. We have
+	some minor work towards both x86->IR AOT and I'm in the process of
+	writing IR->Code AOT.
+	With AOT we can throw heavier optimizations at the IR that we can't do
+	in JIT time. Which will improve long term performance of the
+	application.
+	
+	Currently our code generates a /bunch/ of redundant register moves for
+	example. ARM CPUs that have really good renaming support will be
+	inordinately faster than expected.
+	
+	Some of the things to learn more about translation optimizations
+	mostly looks like reading compiler optimization techniques and picking
+	optimizations that don't take quadratic time complexity like that.
+	So anything compiler theory can help out JITs. There are of course
+	domain specific optimizations, which are what would help JITs the
+	most.
+	For applications using x87, you can optimize that to not use a
+	softfloat emulation for example.
+\end{Verbatim}
+
+\pagebreak
