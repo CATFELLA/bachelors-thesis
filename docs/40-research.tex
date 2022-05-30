@@ -1,6 +1,6 @@
 \section{Исследовательская часть}
 
-В рамках дипломной работы было проведено исследование изменения результатов бенчмарка nbench с разработанным проходом. Результаты исследования представлены в этом разделе.
+В рамках дипломной работы было проведено исследование изменения результатов бенчмарка nbench \cite{nbench} с разработанным проходом. Результаты исследования представлены в этом разделе.
 
 \subsection{Описание используемых данных}
 
@@ -63,7 +63,7 @@
 				pattern=dots
 			}
 			] coordinates {(M1 Firestorm, 37.532) (Mongoose M2, 9.084) (Cortex A72, 10.386) (Cortex A53, 8.832)};
-			\legend{stock, patch}  
+			\legend{baseline, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
 	\caption{nbench O0}
@@ -99,7 +99,7 @@
 				pattern=dots
 			}
 			] coordinates {(M1 Firestorm, 32601) (Mongoose M2, 5559.8) (Cortex A72, 7661.9) (Cortex A53, 3989.2)};
-			\legend{stock, patch}  
+			\legend{baseline, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
 	\caption{nbench FOURIER O0}
@@ -135,7 +135,7 @@
 				pattern=dots
 			}
 			] coordinates {(M1 Firestorm, 2052.9) (Mongoose M2, 494.46) (Cortex A72, 451.94) (Cortex A53, 279.77)};
-			\legend{stock, patch}  
+			\legend{baseline, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
 	\caption{nbench IDEA O0}
@@ -171,7 +171,7 @@
 				pattern=dots
 			}
 			] coordinates {(M1 Firestorm, 487.55) (Mongoose M2, 95.002) (Cortex A72, 86.868) (Cortex A53, 86.536)};
-			\legend{stock, patch}  
+			\legend{baseline, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
 	\caption{nbench HUFFMAN O0}
@@ -207,14 +207,12 @@
 				pattern=dots
 			}
 			] coordinates {(M1 Firestorm, 136.218) (Mongoose M2, 28.36) (Cortex A72, 32.318) (Cortex A53, 23.685)};
-			\legend{stock, patch}  
+			\legend{baseline, patch}  
 		\end{axis}  
 	\end{tikzpicture}\\
 	\caption{nbench O3}
 	\label{fig:o3}
 \end{figure}
-
-сделать baseline
 
 \newpage
 
@@ -236,7 +234,7 @@
 
 Главной причиной разработки алгоритма по оптимизации доступа к памяти являлась слабая модель архитектуры ARM, что при трансляции многопоточных приложений приводило к ошибкам.
 
-Для проверки корректной работы прохода использовался tst-cond16.c --- тест библиотеки libc. Этот тест создает 8 потоков которые проводят операции с мьютексами. Стандартная версия транслятора и версия с оптимизирующим проходом этот тест проходит, без барьерных инструкций и с безусловной заменой барьерных операций связанных с регистром RBP тест не проходит.
+Для проверки корректной работы прохода использовался tst-cond16.c --- тест библиотеки glibc. \cite{glibc} Этот тест создает 8 потоков которые проводят операции с мьютексами. Стандартная версия транслятора и версия с оптимизирующим проходом этот тест проходит, без барьерных инструкций и с безусловной заменой барьерных операций связанных с регистром RBP тест не проходит.
 
 \subsection{Вывод}
 
