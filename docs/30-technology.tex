@@ -12,7 +12,7 @@
 
 \subsubsection{Сборка программного обеспечения}
 
-Для конфигурации проекта используется CMake. \cite{cmake} Для компиляции реализации алгоритма необходимо добавить имя файла в соответствующий CMakeLists.txt.
+Для конфигурации проекта используется CMake. \cite{cmake} Для компиляции реализации алгоритма необходимо добавить имя файла в соответствующий \\ CMakeLists.txt.
 
 Для сборки всего проекта используется ninja. \cite{ninja} На листинге \ref{code:args} указана конфигурация сборки проекта.
 
@@ -149,7 +149,74 @@ CodePtr,
 
 %диаграмма функциональная типа функции кто кого вызывает
 
-вставить структуры в виде листинга, вставить классы феха?!!!!!!!!!!!!!!!!!!
+На листингах \ref{code:blockinfo}-\ref{} представлены реализации описанных в конструкторской части структур данных.
+
+\begin{code}
+	\captionof{listing}{Структуры данных использующиеся в оптимизирующем проходе}
+	\label{code:blockinfo}
+	\begin{minted}
+		[
+		frame=single,
+		framerule=0.5pt,
+		framesep=20pt,
+		fontsize=\small,
+		tabsize=4,
+		linenos,
+		numbersep=5pt,
+		xleftmargin=10pt,
+		]
+		{text}
+enum RBP_STATE {
+	NOT_CHANGED = (0b000 << 0),
+	STACK = (0b001 << 0),
+	NOT_STACK = (0b010 << 0),
+};
+
+struct BlockInfo {
+	int State = NOT_CHANGED;
+	std::set<OrderedNode*> StackNodes;
+	std::set<OrderedNode*> UnStackNodes;
+	std::vector<OrderedNode*> Predecessors;
+	bool Visited = false;
+};
+
+std::unordered_map<NodeID, BlockInfo> OffsetToBlockMap;
+\end{minted}
+\end{code}
+
+\begin{code}
+	\captionof{listing}{Реализация OrderedNode в FEX}
+	\label{code:blockinfo}
+	\begin{minted}
+		[
+		frame=single,
+		framerule=0.5pt,
+		framesep=20pt,
+		fontsize=\small,
+		tabsize=4,
+		linenos,
+		numbersep=5pt,
+		xleftmargin=10pt,
+		]
+		{text}
+struct OrderedNodeHeader {
+	OpNodeWrapper Value;
+	OrderedNodeWrapper Next;
+	OrderedNodeWrapper Previous;
+};
+		
+class OrderedNode final {
+	friend class NodeWrapperIterator;
+	friend class OrderedList;
+	public:
+	OrderedNodeHeader Header;
+	uint32_t NumUses;
+		
+	...
+
+};
+	\end{minted}
+\end{code}
 
 \subsection{Вывод}
 

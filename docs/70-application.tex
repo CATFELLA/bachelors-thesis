@@ -173,7 +173,6 @@ namespace FEXCore::IR {
 		TargetBlock->Visited = true;
 		int ResultingState = STACK;
 		for (auto i : TargetBlock->Predecessors) {
-			// only call if predecessor is not visited?
 			if (i == TargetNode) {
 				continue;
 			}
