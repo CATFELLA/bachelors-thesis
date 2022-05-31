@@ -141,7 +141,7 @@ $OrderedNode$ --- класс описывающий индивидуальную
 		\State $ControlFlow$ $\gets$ граф потока выполнения блоков
 		\State $ResultingState$ $\gets$ состояния стека для блока с учетом предыдущих
 		\State $out$ $\gets$ ON\_STACK
-		\For{$i$ in предшевственники $TargetBlock$}
+		\For{$i$ in предшественники $TargetBlock$}
 		\State $PredecessorState$ $\gets$ рассчитать распространенное состояние стека для $i$
 		\If {$PredecessorState$ = NOT\_CHANGED}
 		\State $ResultingState$ $\gets$ NOT\_CHANGED

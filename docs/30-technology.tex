@@ -125,7 +125,7 @@ CodePtr,
 Ведущими разработчиками являются такие то, чтобы пропихнуть патч надо то-то. Требуется одобрение такого то.
 \end{comment}
 
-\subsection{Методы оптимизирующего прохода.}
+\subsection{Методы оптимизирующего прохода}
 
 Всего реализовано 4 метода класса: Run, CalculateControlFlowInfo, \\ CalculateComplexState и HitsRegister.
 
@@ -149,7 +149,7 @@ CodePtr,
 
 %диаграмма функциональная типа функции кто кого вызывает
 
-На листингах \ref{code:blockinfo}-\ref{} представлены реализации описанных в конструкторской части структур данных.
+На листингах \ref{code:blockinfo}-\ref{code:ordered} представлены реализации описанных в конструкторской части структур данных.
 
 \begin{code}
 	\captionof{listing}{Структуры данных использующиеся в оптимизирующем проходе}
@@ -186,7 +186,7 @@ std::unordered_map<NodeID, BlockInfo> OffsetToBlockMap;
 
 \begin{code}
 	\captionof{listing}{Реализация OrderedNode в FEX}
-	\label{code:blockinfo}
+	\label{code:ordered}
 	\begin{minted}
 		[
 		frame=single,
